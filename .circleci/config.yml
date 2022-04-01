@@ -8,6 +8,9 @@ jobs:
       foo:
         type: env_var_name
         default: FOO
+      bar:
+        type: string
+        default: $BAR
       docker-image:
         type: env_var_name
         default: DOCKER_MAIN_IMAGE
@@ -18,12 +21,19 @@ jobs:
           password: $DOCKER_PERSONAL_ACCESS_TOKEN
     steps:
       - run:
-          name: check FOO in various ways
+          name: check << parameters.foo >> env var in various ways
           command: |
             echo $<< parameters.foo >>
             echo $FOO
           environment:
-            FOO: bar
+            FOO: fizz
+      - run:
+          name: check << parameters.bar >> string in various ways
+          command: |
+            echo << parameters.bar >>
+            echo $BAR
+          environment:
+            BAR: buzz
 
 workflows:
   envvars-are-fun:
