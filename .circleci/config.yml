@@ -53,7 +53,10 @@ jobs:
       - run:
           name: check context
           command: |
+            # will print /home/circleci/project/$CUSTOM_WORKDIR_NAME
+            # instead of /home/circleci/project/repo
             pwd
+
             ls -laH
 
 workflows:
