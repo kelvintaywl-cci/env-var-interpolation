@@ -37,10 +37,9 @@ jobs:
             BAR: buzz
   explore-workdir:
     environment:
-      DOCKER_MAIN_IMAGE: cimg/base:stable
       CUSTOM_WORKDIR_NAME: repo
     docker:
-      - image: $<< parameters.docker-image >>
+      - image: cimg/base:stable
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PERSONAL_ACCESS_TOKEN
