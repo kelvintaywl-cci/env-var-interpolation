@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  envvars-explore:
+  explore-params:
     environment:
       DOCKER_MAIN_IMAGE: cimg/base:stable
     parameters:
@@ -19,6 +19,7 @@ jobs:
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PERSONAL_ACCESS_TOKEN
+    resource_class: small
     steps:
       - run:
           name: check << parameters.foo >> env var in various ways
@@ -34,8 +35,26 @@ jobs:
             echo $BAR
           environment:
             BAR: buzz
+  explore-workdir:
+    environment:
+      DOCKER_MAIN_IMAGE: cimg/base:stable
+      CUSTOM_WORKDIR_NAME: repo
+    docker:
+      - image: $<< parameters.docker-image >>
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PERSONAL_ACCESS_TOKEN
+    resource_class: small
+    working_directory: $CUSTOM_WORKDIR_NAME
+    steps:
+      - run:
+          name: check context
+          command: |
+            pwd
+            ls -laH
 
 workflows:
   envvars-are-fun:
     jobs:
-      - envvars-explore
+      - explore-params
+      - explore-workdir
