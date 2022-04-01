@@ -1,0 +1,31 @@
+version: 2.1
+
+jobs:
+  envvars-explore:
+    environment:
+      DOCKER_MAIN_IMAGE: cimg/base:stable
+    parameters:
+      foo:
+        type: env_var_name
+        default: FOO
+      docker-image:
+        type: env_var_name
+        default: DOCKER_MAIN_IMAGE
+    docker:
+      - image: $<< parameters.docker-image >>
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PERSONAL_ACCESS_TOKEN
+    steps:
+      - run:
+          name: check FOO in various ways
+          command: |
+            echo $<< parameters.foo >>
+            echo $FOO
+          environment:
+            FOO: bar
+
+workflows:
+  envvars-are-fun:
+    jobs:
+      - envvars-explore
