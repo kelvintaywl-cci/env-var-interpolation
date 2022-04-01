@@ -38,9 +38,12 @@ jobs:
   explore-workdir:
     environment:
       CUSTOM_WORKDIR_NAME: repo
-      DOCKER_MAIN_IMAGE: cimg/base:stable
+      # essentially, Docker Hub
+      DOCKER_REGISTRY: docker.io
+      DOCKER_IMAGE: cimg/base
+      DOCKER_TAG: stable
     docker:
-      - image: $DOCKER_MAIN_IMAGE
+      - image: $DOCKER_REGISTRY/$DOCKER_MAIN_IMAGE:$DOCKER_TAG
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PERSONAL_ACCESS_TOKEN
