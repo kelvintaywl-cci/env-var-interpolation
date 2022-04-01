@@ -38,8 +38,9 @@ jobs:
   explore-workdir:
     environment:
       CUSTOM_WORKDIR_NAME: repo
+      DOCKER_MAIN_IMAGE: cimg/base:stable
     docker:
-      - image: cimg/base:stable
+      - image: $DOCKER_MAIN_IMAGE
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PERSONAL_ACCESS_TOKEN
