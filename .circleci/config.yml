@@ -16,22 +16,31 @@ jobs:
           # こちらのシェールセッションには、AWS_ACCESS_KEY_ID 環境変数が変更された。
           command: |
             export AWS_ACCESS_KEY_ID=foobar
+            # should be foobar
             printenv AWS_ACCESS_KEY_ID
       - run:
           name: 環境変数を確認する
           # ただ、次のステップは新しいシェールセッションでコマンドを実行する。
           # このため、AWS_ACCESS_KEY_ID が hogehoge になります。
           command: |
+            # will be hogehoge
             printenv AWS_ACCESS_KEY_ID
       - run:
           name: 環境変数を次のステップにも新しい値を利用できるため
           # BASH_ENV ファイルが全てのスッテプで読まれる。
           command: |
             echo 'export AWS_ACCESS_KEY_ID=foobar' >> $BASH_ENV
+
+            # this will still be hogehoge
+            printenv AWS_ACCESS_KEY_ID
+
+            # should be foobar
+            source $BASH_ENV
             printenv AWS_ACCESS_KEY_ID
       - run:
           name: 環境変数を確認する
           command: |
+            # should be foobar
             printenv AWS_ACCESS_KEY_ID
 
 workflows:
