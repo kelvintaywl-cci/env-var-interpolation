@@ -1,66 +1,40 @@
 version: 2.1
 
 jobs:
-  explore-params:
+  explore:
     environment:
-      DOCKER_MAIN_IMAGE: cimg/base:stable
-    parameters:
-      foo:
-        type: env_var_name
-        default: FOO
-      bar:
-        type: string
-        default: $BAR
-      docker-image:
-        type: env_var_name
-        default: DOCKER_MAIN_IMAGE
+      AWS_ACCESS_KEY_ID: hogehoge
     docker:
-      - image: $<< parameters.docker-image >>
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PERSONAL_ACCESS_TOKEN
-    resource_class: small
+      - image: circleci/golang:1.15
     steps:
       - run:
-          name: check << parameters.foo >> env var in various ways
+          name: 環境変数を確認する
           command: |
-            echo $<< parameters.foo >>
-            echo $FOO
-          environment:
-            FOO: fizz
+            printenv AWS_ACCESS_KEY_ID
       - run:
-          name: check << parameters.bar >> string in various ways
+          name: 環境変数を変更してみる
+          # こちらのシェールセッションには、AWS_ACCESS_KEY_ID 環境変数が変更された。
           command: |
-            echo << parameters.bar >>
-            echo $BAR
-          environment:
-            BAR: buzz
-  explore-workdir:
-    environment:
-      CUSTOM_WORKDIR_NAME: repo
-      # essentially, Docker Hub
-      DOCKER_REGISTRY: docker.io
-      DOCKER_IMAGE: cimg/base
-      DOCKER_TAG: stable
-    docker:
-      - image: $DOCKER_REGISTRY/$DOCKER_IMAGE:$DOCKER_TAG
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PERSONAL_ACCESS_TOKEN
-    resource_class: small
-    working_directory: $CUSTOM_WORKDIR_NAME
-    steps:
+            export AWS_ACCESS_KEY_ID=foobar
+            printenv AWS_ACCESS_KEY_ID
       - run:
-          name: check context
+          name: 環境変数を確認する
+          # ただ、次のステップは新しいシェールセッションでコマンドを実行する。
+          # このため、AWS_ACCESS_KEY_ID が hogehoge になります。
           command: |
-            # will print /home/circleci/project/$CUSTOM_WORKDIR_NAME
-            # instead of /home/circleci/project/repo
-            pwd
-
-            ls -laH
+            printenv AWS_ACCESS_KEY_ID
+      - run:
+          name: 環境変数を次のステップにも新しい値を利用できるため
+          # BASH_ENV ファイルが全てのスッテプで読まれる。
+          command: |
+            echo 'export AWS_ACCESS_KEY_ID=foobar' >> $BASH_ENV
+            printenv AWS_ACCESS_KEY_ID
+      - run:
+          name: 環境変数を確認する
+          command: |
+            printenv AWS_ACCESS_KEY_ID
 
 workflows:
-  envvars-are-fun:
+  main:
     jobs:
-      - explore-params
-      - explore-workdir
+      - explore
